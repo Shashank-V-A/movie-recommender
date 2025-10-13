@@ -1,43 +1,13 @@
 {
-  "name": "cinefindr",
+  "name": "movie-recommender",
   "version": "1.0.0",
-  "description": "Production-ready multilingual movie and series recommender with legal watch links",
-  "private": true,
-  "workspaces": [
-    "apps/web",
-    "apps/api",
-    "packages/*"
-  ],
+  "description": "Full-stack movie recommendation system",
   "scripts": {
-    "setup": "npm install && npm run db:setup && npm run seed",
-    "db:setup": "cd apps/api && npx prisma generate && npx prisma migrate deploy && npm run db:pgvector",
-    "db:pgvector": "cd apps/api && npm run db:pgvector",
-    "seed": "cd apps/api && npm run seed",
-    "embed": "cd apps/api && npm run embed",
-    "reco": "cd apps/api && npm run reco",
-    "dev": "concurrently \"npm run dev:api\" \"npm run dev:web\"",
-    "dev:api": "cd apps/api && npm run start:dev",
-    "dev:web": "cd apps/web && npm run dev",
-    "build": "npm run build:api && npm run build:web",
-    "build:api": "cd apps/api && npm run build",
-    "build:web": "cd apps/web && npm run build",
-    "test": "npm run test:api && npm run test:web",
-    "test:api": "cd apps/api && npm run test",
-    "test:web": "cd apps/web && npm run test",
-    "test:e2e": "cd apps/web && npm run test:e2e",
-    "lint": "npm run lint:api && npm run lint:web",
-    "lint:api": "cd apps/api && npm run lint",
-    "lint:web": "cd apps/web && npm run lint",
-    "docker:up": "docker-compose up -d",
-    "docker:down": "docker-compose down",
-    "docker:logs": "docker-compose logs -f"
-  },
-  "devDependencies": {
-    "concurrently": "^8.2.2"
+    "build": "cd apps/api && npm install && npm run build",
+    "start": "cd apps/api && npm run start:prod"
   },
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=9.0.0"
   }
 }
-
