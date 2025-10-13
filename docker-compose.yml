@@ -1,0 +1,95 @@
+version: '3.9'
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: cinefindr-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-cinefindr}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cinefindr}
+      POSTGRES_DB: ${POSTGRES_DB:-cinefindr}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-cinefindr}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cinefindr-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: cinefindr-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - cinefindr-network
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: cinefindr-api
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-cinefindr}:${POSTGRES_PASSWORD:-cinefindr}@db:5432/${POSTGRES_DB:-cinefindr}
+      REDIS_URL: redis://redis:6379
+      TMDB_API_KEY: ${TMDB_API_KEY}
+      JUSTWATCH_ENABLED: ${JUSTWATCH_ENABLED:-false}
+      JUSTWATCH_PARTNER_KEY: ${JUSTWATCH_PARTNER_KEY}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+      RECO_CONTENT_WEIGHT: ${RECO_CONTENT_WEIGHT:-0.6}
+      RECO_COLLAB_WEIGHT: ${RECO_COLLAB_WEIGHT:-0.4}
+      DEFAULT_REGION: ${DEFAULT_REGION:-US}
+    ports:
+      - "3001:3001"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - cinefindr-network
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: cinefindr-web
+    environment:
+      NEXT_PUBLIC_API_URL: http://api:3001
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-cinefindr}:${POSTGRES_PASSWORD:-cinefindr}@db:5432/${POSTGRES_DB:-cinefindr}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+    ports:
+      - "3000:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - cinefindr-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  cinefindr-network:
+    driver: bridge
+
