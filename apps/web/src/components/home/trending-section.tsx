@@ -3,7 +3,7 @@
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api';
-import { TitleCard } from '@/components/title-card';
+// TitleCard import removed; handled by TitleRow
 import { TitleRow } from '@/components/title-row';
 
 export function TrendingSection() {

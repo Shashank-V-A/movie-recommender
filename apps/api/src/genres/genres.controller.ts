@@ -9,5 +9,10 @@ export class GenresController {
   async getGenres() {
     return this.genresService.getGenres();
   }
+
+  @Get('stats')
+  async getGenreStats() {
+    return this.genresService.getGenreStats();
+  }
 }
 

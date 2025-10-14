@@ -111,6 +111,114 @@ const resources = {
       },
     },
   },
+  es: {
+    translation: {
+      common: {
+        search: 'Buscar',
+        movies: 'Películas',
+        series: 'Series',
+        genres: 'Géneros',
+        trending: 'Tendencias',
+        recommendations: 'Para ti',
+        watchNow: 'Ver ahora',
+        notAvailable: 'No disponible en tu región',
+        signIn: 'Iniciar sesión',
+        signUp: 'Registrarse',
+        signOut: 'Cerrar sesión',
+        profile: 'Perfil',
+        settings: 'Configuración',
+      },
+      home: {
+        hero: {
+          title: 'Descubre tu próxima película',
+          subtitle: 'Encuentra películas y series en todas las plataformas y idiomas',
+        },
+        trending: 'Tendencias ahora',
+        newOnPlatform: 'Nuevo en {{platform}}',
+        topGenre: 'Top {{genre}}',
+      },
+      search: {
+        placeholder: 'Buscar películas y series...',
+        filters: 'Filtros',
+        sortBy: 'Ordenar por',
+        noResults: 'No se encontraron resultados',
+      },
+      title: {
+        cast: 'Reparto',
+        crew: 'Equipo',
+        overview: 'Resumen',
+        genres: 'Géneros',
+        languages: 'Idiomas',
+        rating: 'Calificación',
+        runtime: 'Duración',
+        releaseDate: 'Fecha de lanzamiento',
+        similar: 'Títulos similares',
+        whereToWatch: 'Dónde ver',
+      },
+      profile: {
+        preferences: 'Preferencias',
+        preferredGenres: 'Géneros preferidos',
+        preferredLanguages: 'Idiomas preferidos',
+        preferredProviders: 'Proveedores preferidos',
+        region: 'Región',
+        save: 'Guardar',
+      },
+    },
+  },
+  fr: {
+    translation: {
+      common: {
+        search: 'Rechercher',
+        movies: 'Films',
+        series: 'Séries',
+        genres: 'Genres',
+        trending: 'Tendances',
+        recommendations: 'Pour vous',
+        watchNow: 'Regarder maintenant',
+        notAvailable: 'Non disponible dans votre région',
+        signIn: 'Se connecter',
+        signUp: 'S\'inscrire',
+        signOut: 'Se déconnecter',
+        profile: 'Profil',
+        settings: 'Paramètres',
+      },
+      home: {
+        hero: {
+          title: 'Découvrez votre prochain film',
+          subtitle: 'Trouvez des films et séries sur toutes les plateformes et langues',
+        },
+        trending: 'Tendances maintenant',
+        newOnPlatform: 'Nouveau sur {{platform}}',
+        topGenre: 'Top {{genre}}',
+      },
+      search: {
+        placeholder: 'Rechercher des films et séries...',
+        filters: 'Filtres',
+        sortBy: 'Trier par',
+        noResults: 'Aucun résultat trouvé',
+      },
+      title: {
+        cast: 'Distribution',
+        crew: 'Équipe',
+        overview: 'Résumé',
+        genres: 'Genres',
+        languages: 'Langues',
+        rating: 'Note',
+        runtime: 'Durée',
+        releaseDate: 'Date de sortie',
+        similar: 'Titres similaires',
+        whereToWatch: 'Où regarder',
+      },
+      profile: {
+        preferences: 'Préférences',
+        preferredGenres: 'Genres préférés',
+        preferredLanguages: 'Langues préférées',
+        preferredProviders: 'Fournisseurs préférés',
+        region: 'Région',
+        save: 'Enregistrer',
+      },
+    },
+  },
 };
 
 i18n
@@ -119,8 +227,13 @@ i18n
   .init({
     resources,
     fallbackLng: 'en',
+    lng: typeof window !== 'undefined' ? localStorage.getItem('cinefindr-language') || 'en' : 'en',
     interpolation: {
       escapeValue: false,
+    },
+    detection: {
+      lookupLocalStorage: 'cinefindr-language',
+      caches: ['localStorage'],
     },
   });
 

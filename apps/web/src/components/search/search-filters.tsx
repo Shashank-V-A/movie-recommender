@@ -19,9 +19,10 @@ export function SearchFilters({ filters, onFiltersChange }: SearchFiltersProps) 
   });
 
   const toggleGenre = (genreName: string) => {
-    const newGenres = filters.genres.includes(genreName)
-      ? filters.genres.filter((g: string) => g !== genreName)
-      : [...filters.genres, genreName];
+    const currentGenres = filters.genres || [];
+    const newGenres = currentGenres.includes(genreName)
+      ? currentGenres.filter((g: string) => g !== genreName)
+      : [...currentGenres, genreName];
     onFiltersChange({ ...filters, genres: newGenres });
   };
 
@@ -53,7 +54,7 @@ export function SearchFilters({ filters, onFiltersChange }: SearchFiltersProps) 
             {genres?.map((genre: any) => (
               <Button
                 key={genre.id}
-                variant={filters.genres.includes(genre.name) ? 'default' : 'outline'}
+                variant={(filters.genres || []).includes(genre.name) ? 'default' : 'outline'}
                 className="w-full"
                 onClick={() => toggleGenre(genre.name)}
               >

@@ -24,7 +24,13 @@ export class SearchService {
     }
 
     if (query.genres?.length > 0) {
-      where.genres = { hasSome: query.genres };
+      // Use hasEvery instead of hasSome to avoid duplicates from overlapping genres
+      // For single genre, use hasSome; for multiple genres, use hasEvery
+      if (query.genres.length === 1) {
+        where.genres = { hasSome: query.genres };
+      } else {
+        where.genres = { hasEvery: query.genres };
+      }
     }
 
     if (query.yearFrom || query.yearTo) {

@@ -11,7 +11,7 @@ export class AdminService {
     private cacheService: CacheService,
   ) {}
 
-  async syncFromTmdb(type: 'movie' | 'tv' = 'movie') {
+  async syncFromTmdb(_type: 'movie' | 'tv' = 'movie') {
     await this.cacheService.delPattern('tmdb:*');
 
     return {

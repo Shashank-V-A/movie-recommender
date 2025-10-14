@@ -1,10 +1,16 @@
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
-import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
-const prisma = new PrismaClient();
+let prismaInstance: any;
+async function getPrisma() {
+  if (!prismaInstance) {
+    const { PrismaClient } = await import('@prisma/client');
+    prismaInstance = new PrismaClient();
+  }
+  return prismaInstance;
+}
 
 const handler = NextAuth({
   providers: [
@@ -15,6 +21,7 @@ const handler = NextAuth({
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
+        const prisma = await getPrisma();
         if (!credentials?.email || !credentials?.password) {
           return null;
         }
@@ -55,7 +62,9 @@ const handler = NextAuth({
   callbacks: {
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.sub;
+        if (token.sub) {
+          session.user.id = token.sub;
+        }
       }
       return session;
     },

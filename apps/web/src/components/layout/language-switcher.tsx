@@ -10,6 +10,8 @@ export function LanguageSwitcher() {
   const toggleLanguage = () => {
     const newLang = i18n.language === 'en' ? 'hi' : 'en';
     i18n.changeLanguage(newLang);
+    // Save to localStorage for persistence
+    localStorage.setItem('cinefindr-language', newLang);
   };
 
   return (

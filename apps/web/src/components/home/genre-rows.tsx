@@ -24,13 +24,18 @@ export function GenreRows() {
 function GenreRow({ genre }: { genre: string }) {
   const { data, isLoading } = useQuery({
     queryKey: ['search', { genres: genre }],
-    queryFn: () => api.search({ q: '', genres: genre, page: 1 }),
+    queryFn: () => api.search({ q: '', genres: [genre], page: 1, limit: 20 }),
   });
 
   if (isLoading || !data?.results?.length) {
     return null;
   }
 
-  return <TitleRow title={`Top ${genre}`} titles={data.results} />;
+  // Remove duplicates based on title ID
+  const uniqueTitles = data.results.filter((title: any, index: number, self: any[]) => 
+    index === self.findIndex((t) => t.id === title.id)
+  );
+
+  return <TitleRow title={`Top ${genre}`} titles={uniqueTitles.slice(0, 12)} />;
 }
 

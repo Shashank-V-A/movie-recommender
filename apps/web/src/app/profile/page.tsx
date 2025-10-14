@@ -1,50 +1,46 @@
 'use client';
 
-import { useState } from 'react';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { api } from '@/lib/api';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
 export default function ProfilePage() {
-  const { t } = useTranslation();
-  const userId = 'demo-user';
+  const { t, i18n } = useTranslation();
+  const [currentLanguage, setCurrentLanguage] = useState<string>(i18n.language);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const { data: profile } = useQuery({
-    queryKey: ['profile', userId],
-    queryFn: () => api.getProfile(userId),
-  });
+  // Load saved language from localStorage on mount
+  useEffect(() => {
+    const savedLanguage = localStorage.getItem('cinefindr-language');
+    if (savedLanguage && savedLanguage !== i18n.language) {
+      setCurrentLanguage(savedLanguage);
+      i18n.changeLanguage(savedLanguage);
+    }
+  }, [i18n]);
 
-  const { data: genres } = useQuery({
-    queryKey: ['genres'],
-    queryFn: api.getGenres,
-  });
-
-  const [selectedGenres, setSelectedGenres] = useState<string[]>(
-    profile?.preferredGenres || []
-  );
-  const [selectedLanguages, setSelectedLanguages] = useState<string[]>(
-    profile?.preferredLanguages || ['en']
-  );
-
-  const updateMutation = useMutation({
-    mutationFn: (data: any) => api.updateProfile(userId, data),
-  });
-
-  const handleSave = () => {
-    updateMutation.mutate({
-      preferredGenres: selectedGenres,
-      preferredLanguages: selectedLanguages,
-    });
+  const handleLanguageChange = (langCode: string) => {
+    setCurrentLanguage(langCode);
+    i18n.changeLanguage(langCode);
   };
 
-  const toggleGenre = (genreName: string) => {
-    setSelectedGenres((prev) =>
-      prev.includes(genreName)
-        ? prev.filter((g) => g !== genreName)
-        : [...prev, genreName]
-    );
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      // Save language to localStorage for persistence
+      localStorage.setItem('cinefindr-language', currentLanguage);
+      
+      // Save to backend (optional - for user profiles)
+      // For now, we'll just use localStorage for simplicity
+      
+      // Show success message
+      alert('Language preference saved successfully!');
+    } catch (error) {
+      console.error('Failed to save language preference:', error);
+      alert('Failed to save language preference. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const languages = [
@@ -61,61 +57,48 @@ export default function ProfilePage() {
       <div className="space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle>{t('profile.preferredGenres')}</CardTitle>
+            <CardTitle>Language Settings</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Choose your preferred language for the website interface. This setting will be saved and remembered for your next visit.
+            </p>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-              {genres?.map((genre: any) => (
-                <Button
-                  key={genre.id}
-                  variant={selectedGenres.includes(genre.name) ? 'default' : 'outline'}
-                  onClick={() => toggleGenre(genre.name)}
-                  className="w-full"
-                >
-                  {genre.name}
-                </Button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('profile.preferredLanguages')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {languages.map((lang) => (
                 <Button
                   key={lang.code}
-                  variant={selectedLanguages.includes(lang.code) ? 'default' : 'outline'}
-                  onClick={() =>
-                    setSelectedLanguages((prev) =>
-                      prev.includes(lang.code)
-                        ? prev.filter((l) => l !== lang.code)
-                        : [...prev, lang.code]
-                    )
-                  }
-                  className="w-full"
+                  variant={currentLanguage === lang.code ? 'default' : 'outline'}
+                  onClick={() => handleLanguageChange(lang.code)}
+                  className="w-full h-12 text-sm"
                 >
                   {lang.name}
                 </Button>
               ))}
             </div>
+            
+            <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+              <div className="flex items-start gap-3">
+                <div className="text-blue-600 dark:text-blue-400 mt-0.5">
+                  ℹ️
+                </div>
+                <div className="text-sm text-blue-800 dark:text-blue-200">
+                  <p className="font-medium mb-1">Current Language: {languages.find(l => l.code === currentLanguage)?.name}</p>
+                  <p>Changes take effect immediately. Click "Save Language" to make this setting permanent.</p>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
         <div className="flex justify-end">
-          <Button onClick={handleSave} disabled={updateMutation.isPending}>
-            {updateMutation.isPending ? 'Saving...' : t('profile.save')}
+          <Button 
+            onClick={handleSave} 
+            disabled={isSaving}
+            className="px-8"
+          >
+            {isSaving ? 'Saving...' : 'Save Language'}
           </Button>
         </div>
-
-        {updateMutation.isSuccess && (
-          <div className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100 p-4 rounded-md">
-            Profile updated successfully!
-          </div>
-        )}
       </div>
     </div>
   );

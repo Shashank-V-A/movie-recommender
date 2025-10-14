@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
@@ -10,7 +11,7 @@ import { SearchFilters } from '@/components/search/search-filters';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 
-export default function SearchPage() {
+function SearchPageInner() {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
   const [query, setQuery] = useState(searchParams.get('q') || '');
@@ -61,6 +62,14 @@ export default function SearchPage() {
         </main>
       </div>
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<div className="container mx-auto px-4 py-8">Loading...</div>}>
+      <SearchPageInner />
+    </Suspense>
   );
 }
 
