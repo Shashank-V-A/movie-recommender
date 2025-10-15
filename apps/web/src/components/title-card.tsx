@@ -6,9 +6,10 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Star, Bookmark, BookmarkCheck } from 'lucide-react';
 import { useSavedTitles } from '@/lib/hooks/use-saved-titles';
+import { Title } from '@/types/title';
 
 interface TitleCardProps {
-  title: any;
+  title: Title;
 }
 
 export function TitleCard({ title }: TitleCardProps) {

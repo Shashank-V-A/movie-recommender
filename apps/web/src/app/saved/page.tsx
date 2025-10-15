@@ -5,6 +5,7 @@ import { useSavedTitles } from '@/lib/hooks/use-saved-titles';
 import { api } from '@/lib/api';
 import { TitleCard } from '@/components/title-card';
 import { Bookmark } from 'lucide-react';
+import { Title } from '@/types/title';
 
 export default function SavedPage() {
   const { getSavedTitleIds } = useSavedTitles();
@@ -17,9 +18,9 @@ export default function SavedPage() {
       if (savedIds.length === 0) return [];
       
       // Fetch titles by IDs
-      const titlePromises = savedIds.map(id => api.getTitle(id));
+      const titlePromises = savedIds.map((id: string) => api.getTitle(id));
       const titles = await Promise.all(titlePromises);
-      return titles.filter(Boolean); // Remove any null/undefined results
+      return titles.filter(Boolean) as Title[]; // Remove any null/undefined results
     },
     enabled: savedIds.length > 0,
   });
@@ -60,7 +61,7 @@ export default function SavedPage() {
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          {(savedTitles ?? []).map((title: any) => (
+          {(savedTitles ?? []).map((title: Title) => (
             <TitleCard key={title.id} title={title} />
           ))}
         </div>
