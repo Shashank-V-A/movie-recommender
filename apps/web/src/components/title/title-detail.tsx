@@ -159,7 +159,7 @@ export function TitleDetail({ id }: TitleDetailProps) {
               </div>
             )}
 
-            <WatchProviders titleId={id} />
+            <WatchProviders titleId={id} titleName={title?.originalTitle || title?.localizedTitle || "Movie"} />
           </div>
         </div>
 

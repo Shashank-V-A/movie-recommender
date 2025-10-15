@@ -10,56 +10,76 @@ import { ExternalLink } from 'lucide-react';
 
 interface WatchProvidersProps {
   titleId: string;
+  titleName?: string;
 }
 
-export function WatchProviders({ titleId }: WatchProvidersProps) {
+export function WatchProviders({ titleId, titleName = "Movie" }: WatchProvidersProps) {
   const { t } = useTranslation();
 
-  const { data: title } = useQuery({
-    queryKey: ['title', titleId],
-    queryFn: () => api.getTitle(titleId),
+  const { data: providers, isLoading } = useQuery({
+    queryKey: ['watch-providers', titleId],
+    queryFn: async () => {
+      const response = await fetch(`/api/titles/${titleId}/providers`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch providers');
+      }
+      return response.json();
+    },
   });
 
-  const availability = title?.availability || [];
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <h2 className="text-xl font-semibold mb-4">{t('title.whereToWatch')}</h2>
+          <p className="text-muted-foreground">Loading watch options...</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const availability = providers?.results || [];
 
   if (availability.length === 0) {
     return (
       <Card>
         <CardContent className="p-6">
           <h2 className="text-xl font-semibold mb-4">{t('title.whereToWatch')}</h2>
-          <p className="text-muted-foreground">{t('common.notAvailable')}</p>
+          <p className="text-muted-foreground">Check back later for availability</p>
         </CardContent>
       </Card>
     );
   }
 
   // Helper function to generate search links for streaming platforms
-  const getProviderSearchLink = (providerName: string) => {
-    const titleName = encodeURIComponent(title.localizedTitle || title.originalTitle);
+  const getProviderSearchLink = (providerName: string, titleName: string) => {
+    const encodedTitle = encodeURIComponent(titleName);
     
     // Platform-specific search URLs
     const searchLinks: Record<string, string> = {
-      'Netflix': `https://www.netflix.com/search?q=${titleName}`,
-      'Amazon Prime Video': `https://www.primevideo.com/search/ref=atv_nb_sr?phrase=${titleName}`,
-      'Disney Plus': `https://www.disneyplus.com/search?q=${titleName}`,
-      'Disney+': `https://www.disneyplus.com/search?q=${titleName}`,
-      'HBO Max': `https://www.hbomax.com/search?q=${titleName}`,
-      'Hulu': `https://www.hulu.com/search?q=${titleName}`,
-      'Apple TV Plus': `https://tv.apple.com/search?q=${titleName}`,
-      'Apple TV': `https://tv.apple.com/search?q=${titleName}`,
-      'Hotstar': `https://www.hotstar.com/in/search?q=${titleName}`,
+      'Netflix': `https://www.netflix.com/search?q=${encodedTitle}`,
+      'Amazon Prime Video': `https://www.primevideo.com/search/ref=atv_nb_sr?phrase=${encodedTitle}`,
+      'Disney Plus': `https://www.disneyplus.com/search?q=${encodedTitle}`,
+      'Disney+': `https://www.disneyplus.com/search?q=${encodedTitle}`,
+      'HBO Max': `https://www.hbomax.com/search?q=${encodedTitle}`,
+      'Hulu': `https://www.hulu.com/search?q=${encodedTitle}`,
+      'Apple TV Plus': `https://tv.apple.com/search?q=${encodedTitle}`,
+      'Apple TV': `https://tv.apple.com/search?q=${encodedTitle}`,
+      'Hotstar': `https://www.hotstar.com/in/search?q=${encodedTitle}`,
     };
     
     // Return platform search link or Google search as fallback
-    return searchLinks[providerName] || `https://www.google.com/search?q=watch+${titleName}+on+${encodeURIComponent(providerName)}`;
+    return searchLinks[providerName] || `https://www.google.com/search?q=watch+${encodedTitle}+on+${encodeURIComponent(providerName)}`;
   };
 
+  // Use the titleName prop
+  
   const groupedProviders = availability.reduce((acc: any, item: any) => {
     if (!acc[item.providerName]) {
       acc[item.providerName] = {
         name: item.providerName,
         logoPath: item.providerLogoPath,
-        linkUrl: getProviderSearchLink(item.providerName),
+        linkUrl: item.linkUrl || getProviderSearchLink(item.providerName, titleName),
         types: [],
       };
     }
