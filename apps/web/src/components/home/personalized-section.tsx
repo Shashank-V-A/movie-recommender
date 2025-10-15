@@ -9,14 +9,14 @@ export function PersonalizedSection() {
   const { t } = useTranslation();
 
   const { data, isLoading } = useQuery({
-    queryKey: ['recommendations'],
-    queryFn: () => api.getRecommendations(),
+    queryKey: ['trending-series'],
+    queryFn: () => api.search({ q: '', type: 'series', page: 1, limit: 12 }),
   });
 
   if (isLoading || !data?.results?.length) {
     return null;
   }
 
-  return <TitleRow title={t('common.recommendations')} titles={data.results} />;
+  return <TitleRow title="Popular TV Series" titles={data.results} />;
 }
 

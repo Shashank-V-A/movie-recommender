@@ -10,8 +10,8 @@ export function TrendingSection() {
   const { t } = useTranslation();
 
   const { data, isLoading } = useQuery({
-    queryKey: ['search', { q: '', page: 1 }],
-    queryFn: () => api.search({ q: '', page: 1 }),
+    queryKey: ['trending-movies'],
+    queryFn: () => api.search({ q: '', type: 'movie', page: 1, limit: 12 }),
   });
 
   if (isLoading) {
@@ -19,7 +19,7 @@ export function TrendingSection() {
   }
 
   return (
-    <TitleRow title={t('home.trending')} titles={data?.results || []} />
+    <TitleRow title="Trending Movies" titles={data?.results || []} />
   );
 }
 

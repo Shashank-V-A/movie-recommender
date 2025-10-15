@@ -3,6 +3,27 @@ import { NextRequest, NextResponse } from 'next/server';
 const TMDB_API_KEY = process.env.TMDB_API_KEY;
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 
+// Helper function to generate direct links to streaming platforms
+function getProviderSearchLink(providerName: string): string {
+  const searchLinks: Record<string, string> = {
+    'Netflix': 'https://www.netflix.com/search',
+    'Amazon Prime Video': 'https://www.primevideo.com/search',
+    'Disney Plus': 'https://www.disneyplus.com/search',
+    'Disney+': 'https://www.disneyplus.com/search',
+    'HBO Max': 'https://www.hbomax.com/search',
+    'Hulu': 'https://www.hulu.com/search',
+    'Apple TV Plus': 'https://tv.apple.com/search',
+    'Apple TV': 'https://tv.apple.com/search',
+    'Hotstar': 'https://www.hotstar.com/in/search',
+    'Paramount+': 'https://www.paramountplus.com/search',
+    'Peacock': 'https://www.peacocktv.com/search',
+    'Crunchyroll': 'https://www.crunchyroll.com/search',
+    'YouTube': 'https://www.youtube.com/results',
+  };
+  
+  return searchLinks[providerName] || `https://www.google.com/search?q=watch+on+${encodeURIComponent(providerName)}`;
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -39,7 +60,7 @@ export async function GET(
             providerLogoPath: provider.logo_path,
             region,
             monetizationType: 'FLATRATE',
-            linkUrl: regionData.link || `https://www.google.com/search?q=watch+on+${encodeURIComponent(provider.provider_name)}`,
+            linkUrl: getProviderSearchLink(provider.provider_name),
           });
         }
       }
@@ -53,7 +74,7 @@ export async function GET(
             providerLogoPath: provider.logo_path,
             region,
             monetizationType: 'RENT',
-            linkUrl: regionData.link || `https://www.google.com/search?q=rent+on+${encodeURIComponent(provider.provider_name)}`,
+            linkUrl: getProviderSearchLink(provider.provider_name),
           });
         }
       }
@@ -67,7 +88,7 @@ export async function GET(
             providerLogoPath: provider.logo_path,
             region,
             monetizationType: 'BUY',
-            linkUrl: regionData.link || `https://www.google.com/search?q=buy+on+${encodeURIComponent(provider.provider_name)}`,
+            linkUrl: getProviderSearchLink(provider.provider_name),
           });
         }
       }
