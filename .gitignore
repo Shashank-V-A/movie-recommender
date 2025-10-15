@@ -2,6 +2,7 @@
 node_modules/
 .pnp
 .pnp.js
+package-lock.json
 
 # Testing
 coverage/
@@ -57,4 +58,16 @@ apps/api/prisma/migrations/*_*
 test-results/
 playwright-report/
 playwright/.cache/
+
+# TypeScript
+*.tsbuildinfo
+
+# Temporary files
+*.tmp
+*.temp
+
+# Deployment scripts (temporary)
+deploy-setup.js
+setup-env.ps1
+start-*.ps1
 
