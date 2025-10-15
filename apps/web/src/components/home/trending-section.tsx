@@ -10,8 +10,9 @@ export function TrendingSection() {
   const { t } = useTranslation();
 
   const { data, isLoading } = useQuery({
-    queryKey: ['trending-movies'],
+    queryKey: ['trending-movies', { page: 1 }],
     queryFn: () => api.search({ q: '', type: 'movie', page: 1, limit: 12 }),
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
   if (isLoading) {

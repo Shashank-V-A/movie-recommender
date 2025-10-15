@@ -18,9 +18,15 @@ export default function GenresPage() {
   });
 
   const { data: genreTitles, isLoading: isLoadingTitles } = useQuery({
-    queryKey: ['search', { genres: selectedGenre }],
-    queryFn: () => api.search({ q: '', genres: selectedGenre || '', page: 1, limit: 20 }),
+    queryKey: ['genre-preview', { genre: selectedGenre }],
+    queryFn: () => api.search({ 
+      q: '', 
+      genres: selectedGenre ? [selectedGenre] : [], 
+      page: 1, 
+      limit: 20 
+    }),
     enabled: !!selectedGenre,
+    staleTime: 2 * 60 * 1000, // Cache for 2 minutes
   });
 
   if (isLoading) {

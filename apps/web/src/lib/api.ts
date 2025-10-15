@@ -17,8 +17,21 @@ export async function fetchAPI(endpoint: string, options?: RequestInit) {
 
 export const api = {
   search: (params: Record<string, any>) => {
-    const query = new URLSearchParams(params).toString();
-    return fetchAPI(`/api/search?${query}`);
+    const searchParams = new URLSearchParams();
+    
+    // Handle each parameter
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        if (key === 'genres' && Array.isArray(value)) {
+          // Convert genres array to comma-separated string
+          searchParams.set(key, value.join(','));
+        } else {
+          searchParams.set(key, value.toString());
+        }
+      }
+    });
+    
+    return fetchAPI(`/api/search?${searchParams.toString()}`);
   },
 
   getTitle: (id: string, language?: string, region?: string) => {
